@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo.png",
+          "color": "#ffffff"
+        }
+      ]
+    ]
+  }
+}
