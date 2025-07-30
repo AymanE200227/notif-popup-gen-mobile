@@ -5,35 +5,16 @@ on: [workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: reactnativecommunity/react-native-android
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install
 
       - name: Prebuild project
         run: npx expo prebuild
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android licenses
-        run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
       - name: Build APK
         run: |
