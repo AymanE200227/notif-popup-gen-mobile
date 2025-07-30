@@ -11,7 +11,6 @@ jobs:
       JAVA_VERSION: '17'
       ANDROID_COMPILE_SDK: 33
       ANDROID_BUILD_TOOLS: '33.0.0'
-      ANDROID_SDK_TOOLS: '8512546'
 
     steps:
       - name: Checkout repository
@@ -26,6 +25,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Add iOS bundle identifier
+        run: |
+          # Add dummy iOS bundle identifier to app.json
+          jq '.expo.ios.bundleIdentifier = "com.example.dummy"' app.json > temp.json && mv temp.json app.json
+          cat app.json
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -34,19 +39,14 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          sdk-platform: android-${{ env.ANDROID_COMPILE_SDK }}
-          sdk-build-tools: ${{ env.ANDROID_BUILD_TOOLS }}
-          ndk-version: false
-          cmake-version: false
 
       - name: Accept Android licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-${{ env.ANDROID_COMPILE_SDK }}"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_COMPILE_SDK }}"
 
-      - name: Prebuild project
-        run: npx expo prebuild
+      - name: Prebuild project (Android only)
+        run: npx expo prebuild --platform android
 
       - name: Build Android APK
         run: |

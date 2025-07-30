@@ -18,6 +18,10 @@
         "WRITE_EXTERNAL_STORAGE"
       ]
     },
+    "ios": {
+      "bundleIdentifier": "com.yourcompany.usdtdeposit.dummy",
+      "supportsTablet": false
+    },
     "plugins": [
       [
         "expo-notifications",
