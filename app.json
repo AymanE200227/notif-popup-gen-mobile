@@ -1,13 +1,39 @@
 {
   "expo": {
+    "name": "USDT Deposit",
+    "slug": "usdt-deposit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "sdkVersion": "49.0.0",
+    "android": {
+      "package": "com.yourcompany.usdtdeposit",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#121212"
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
     "plugins": [
       [
         "expo-notifications",
         {
-          "icon": "./assets/logo.png",
-          "color": "#ffffff"
+          "icon": "./assets/notification-icon.png",
+          "color": "#28a745"
         }
       ]
-    ]
+    ],
+    "cli": {
+      "appVersionSource": "remote"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ccb8252e-6cc5-4673-94d3-459f76ad439c"
+      }
+    }
   }
 }

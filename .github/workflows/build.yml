@@ -1,0 +1,22 @@
+name: Build Android APK
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - uses: yukiarrr/ios-build-action@v1.5.0
+      with:
+        operating-system: android
+    - uses: mattallty/action-gradle@v1.0.0
+      with:
+        arguments: assembleRelease
+    - uses: actions/upload-artifact@v3
+      with:
+        name: app-release
+        path: android/app/build/outputs/apk/release/app-release.apk
