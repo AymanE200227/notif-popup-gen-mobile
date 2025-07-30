@@ -46,7 +46,26 @@ jobs:
       - name: Prebuild project
         run: npx expo prebuild --platform android
 
-      # FIX: Add execute permission to gradlew
+      - name: Fix expo-splash-screen
+        run: |
+          # Fix the Kotlin compilation error
+          sed -i 's/override fun onContentChanged()/fun onContentChanged()/g' node_modules/expo-splash-screen/android/src/main/java/expo/modules/splashscreen/SplashScreenReactActivityLifecycleListener.kt
+
+      - name: Update Gradle configuration
+        run: |
+          # Add JVM target settings to build.gradle
+          echo -e "\nallprojects {\n    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {\n        kotlinOptions {\n            jvmTarget = \"11\"\n        }\n    }\n}" >> android/build.gradle
+          
+          # Add Java compatibility settings
+          sed -i '/android {/a \
+    compileOptions {\
+        sourceCompatibility JavaVersion.VERSION_11\
+        targetCompatibility JavaVersion.VERSION_11\
+    }\
+    kotlinOptions {\
+        jvmTarget = "11"\
+    }' android/app/build.gradle
+
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
