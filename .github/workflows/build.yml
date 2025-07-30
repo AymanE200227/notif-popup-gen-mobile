@@ -5,45 +5,55 @@ on: [workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_VERSION: 18
+      JAVA_VERSION: '17'
+      ANDROID_COMPILE_SDK: 33
+      ANDROID_BUILD_TOOLS: '33.0.0'
+      ANDROID_SDK_TOOLS: '8512546'
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-platform: android-${{ env.ANDROID_COMPILE_SDK }}
+          sdk-build-tools: ${{ env.ANDROID_BUILD_TOOLS }}
+          ndk-version: false
+          cmake-version: false
+
+      - name: Accept Android licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-${{ env.ANDROID_COMPILE_SDK }}"
 
       - name: Prebuild project
         run: npx expo prebuild
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install Android packages
-        run: |
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
-          sdkmanager --install "cmdline-tools;latest"
-
-      - name: Build APK
+      - name: Build Android APK
         run: |
           cd android
-          ./gradlew clean assembleRelease
+          ./gradlew clean assembleRelease -Pandroid.debug.obsoleteApi=true --no-daemon
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: USDT-Deposit
